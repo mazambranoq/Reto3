@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Triki</string>
+    <string name="first_human">Juegas primero.</string>
+    <string name="turn_human">Tu turno.</string>
+    <string name="turn_computer">turno del andriode.</string>
+    <string name="result_tie">Es un empate.</string>
+    <string name="result_human_wins">Ganaste!</string>
+    <string name="result_computer_wins">El androide ganó!</string>
+</resources>
