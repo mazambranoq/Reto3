@@ -15,6 +15,13 @@ import java.util.Scanner;
 
 public class TicTacToeConsole {
 
+    // The computer's difficulty levels
+    public enum DifficultyLevel {Easy, Harder, Expert};
+
+    // Current difficulty level  private DifficultyLevel
+    private DifficultyLevel mDifficultyLevel = DifficultyLevel.Easy;
+
+
     private char mBoard[] = new char[9];
     public static final int BOARD_SIZE = 9;
 
@@ -23,55 +30,19 @@ public class TicTacToeConsole {
     public static final char OPEN_SPOT = ' ';
     private Random mRand;
 
+    public DifficultyLevel getDifficultyLevel() {
+        return mDifficultyLevel;
+    }
+
+    public void setDifficultyLevel(DifficultyLevel difficultyLevel) {
+        this.mDifficultyLevel = difficultyLevel;
+    }
+
     public TicTacToeConsole() {
 
         // Seed the random number generator
         mRand = new Random();
         clearBoard();
-//        char turn = HUMAN_PLAYER;    // Human starts first
-//        int  win = 0;                // Set to 1, 2, or 3 when game is over
-//
-//        // Keep looping until someone wins or a tie
-//        while (win == 0)
-//        {
-//            displayBoard();
-//
-//            if (turn == HUMAN_PLAYER)
-//            {
-//                getUserMove();
-//                turn = COMPUTER_PLAYER;
-//            }
-//            else
-//            {
-//                getComputerMove();
-//                turn = HUMAN_PLAYER;
-//            }
-//
-//            win = checkForWinner();
-//        }
-//
-//        displayBoard();
-
-        // Report the winner
-
-//        if (win == 1)
-//            System.out.println("It's a tie.");
-//        else if (win == 2)
-//            System.out.println(HUMAN_PLAYER + " wins!");
-//        else if (win == 3)
-//            System.out.println(COMPUTER_PLAYER + " wins!");
-//        else
-//            System.out.println("There is a logic problem!");
-    }
-
-    private void displayBoard()	{
-        System.out.println();
-        System.out.println(mBoard[0] + " | " + mBoard[1] + " | " + mBoard[2]);
-        System.out.println("-----------");
-        System.out.println(mBoard[3] + " | " + mBoard[4] + " | " + mBoard[5]);
-        System.out.println("-----------");
-        System.out.println(mBoard[6] + " | " + mBoard[7] + " | " + mBoard[8]);
-        System.out.println();
     }
 
 
@@ -89,13 +60,40 @@ public class TicTacToeConsole {
     public void setMove(char player, int location){
         mBoard[location] = player;
     }
+
     /** Return the best move for the computer to make. You must call setMove()
      * to actually make the computer move oto that location.
      * @return The best move fot the computer to make (0-8).
      */
     public int getComputerMove(){
-        int move;
+        int move = -1;
+        if (mDifficultyLevel == DifficultyLevel.Easy)
+            move = getRandomMove();
+        else
+            if (mDifficultyLevel == DifficultyLevel.Harder){
+                move = getWinningMove();
+                if(move == -1)
+                    move = getRandomMove();
+            }else
+                if (mDifficultyLevel == DifficultyLevel.Expert){
+                    move = getWinningMove();
+                    if (move == -1)
+                        move = getBlockingMove();
+                    if (move == -1)
+                        move = getRandomMove();
+                }
+        return move;
+    }
 
+    private int getRandomMove(){
+        int move;
+        do{
+            move = mRand.nextInt(BOARD_SIZE);
+        }while(mBoard[move]!=OPEN_SPOT);
+        return move;
+    }
+
+    private int getWinningMove(){
         // First see if there's a move O can make to win
         for (int i = 0; i < BOARD_SIZE; i++) {
             if (mBoard[i] == OPEN_SPOT) {
@@ -109,7 +107,10 @@ public class TicTacToeConsole {
                     mBoard[i] = curr;
             }
         }
+        return -1;
+    }
 
+    private int getBlockingMove(){
         // See if there's a move O can make to block X from winning
         for (int i = 0; i < BOARD_SIZE; i++) {
             if (mBoard[i] == OPEN_SPOT) {
@@ -124,13 +125,9 @@ public class TicTacToeConsole {
                     mBoard[i] = curr;
             }
         }
-
-        // Generate random move
-        do{
-        move = mRand.nextInt(BOARD_SIZE);
-        }while(mBoard[move]!=OPEN_SPOT);
-        return move;
+        return -1;
     }
+
     /**
      * Check for a winner and return a status value indicating whi has won.
      * @return Return 0 if no winner or tie yet, 1 if it is a tie, 2 if X won,

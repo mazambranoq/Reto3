@@ -1,9 +1,23 @@
 <resources>
     <string name="app_name">Triki</string>
+    <string name="new_game">Nuevo juego</string>
+
     <string name="first_human">Juegas primero.</string>
     <string name="turn_human">Tu turno.</string>
     <string name="turn_computer">turno del andriode.</string>
+
     <string name="result_tie">Es un empate.</string>
     <string name="result_human_wins">Ganaste!</string>
     <string name="result_computer_wins">El androide ganó!</string>
+
+    <string name="difficulty">Dificultad</string>
+    <string name="difficulty_choose">Selecciona una dificultad</string>
+    <string name="difficulty_easy">Facil</string>
+    <string name="difficulty_harder">Media</string>
+    <string name="difficulty_expert">Dificil</string>
+
+    <string name="quit">Salir</string>
+    <string name="quit_question">Desea salir?</string>
+    <string name="yes">Sí</string>
+    <string name="no">No</string>
 </resources>

@@ -1,13 +1,18 @@
 package com.example.mazqhalo.triki;
 
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.graphics.Color;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class Triki extends AppCompatActivity {
 
@@ -18,16 +23,80 @@ public class Triki extends AppCompatActivity {
     // Various text displayed
     private TextView mInfoTextView;
 
+    static final int DIALOG_DIFFICULTY_ID = 0;
+    static final int DIALOG_QUIT_ID = 1;
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
-        menu.add("New Game");
+
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.options_menu, menu);
         return true;
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        startNewGame();
+        switch (item.getItemId()) {
+            case R.id.new_game:
+                startNewGame();
+                return true;
+            case R.id.ia_difficulty:
+                showDialog( DIALOG_DIFFICULTY_ID);
+                return true;
+            case R.id.quit:
+                showDialog(DIALOG_QUIT_ID);
+                return true;
+        }
         return true;
+    }
+
+    @Override
+    protected Dialog onCreateDialog(int id) {
+        Dialog dialog = null;
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        switch(id){
+            case DIALOG_DIFFICULTY_ID:
+                builder.setTitle(R.string.difficulty_choose);
+
+                final CharSequence[] levels = {
+                        getResources().getString(R.string.difficulty_easy),
+                        getResources().getString(R.string.difficulty_harder),
+                        getResources().getString(R.string.difficulty_expert)
+                };
+                int selected = 0;
+                builder.setSingleChoiceItems(levels, selected,
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int item) {
+                                dialog.dismiss();
+
+                                mGame.setDifficultyLevel(TicTacToeConsole.DifficultyLevel.values()[item]);
+
+                                Toast.makeText(getApplicationContext(),levels[item],
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                dialog = builder.create();
+
+                break;
+            case DIALOG_QUIT_ID:
+                builder.setMessage(R.string.quit_question)
+                        .setCancelable(false)
+                        .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+                                Triki.this.finish();
+                            }
+                        })
+                        .setNegativeButton(R.string.no, null);
+                dialog = builder.create();
+
+                break;
+        }
+
+        return dialog;
     }
 
     @Override
@@ -67,6 +136,17 @@ public class Triki extends AppCompatActivity {
         mInfoTextView.setText(R.string.first_human);
     }
 
+    /**
+     * Disables buttons to prevent the player to keep going
+     *
+     */
+    private void endGame(){
+        for (int i = 0; i < mBoardButtons.length; i++) {
+            mBoardButtons[i].setEnabled(false);
+            mBoardButtons[i].setOnClickListener(new ButtonClickListener(i));
+        }
+    }
+
     // Handles clicks on the game board buttons
     private class ButtonClickListener implements View.OnClickListener {
         int location;
@@ -89,10 +169,14 @@ public class Triki extends AppCompatActivity {
                     mInfoTextView.setText(R.string.turn_human);
                 else if (winner == 1)
                     mInfoTextView.setText(R.string.result_tie);
-                else if (winner == 2)
+                else if (winner == 2) {
                     mInfoTextView.setText(R.string.result_human_wins);
-                else
+                    endGame();
+                }
+                else{
                     mInfoTextView.setText(R.string.result_computer_wins);
+                    endGame();
+                }
             }
         }
     }
